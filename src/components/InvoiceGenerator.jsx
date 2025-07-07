@@ -8,6 +8,7 @@ const InvoiceGenerator = () => {
 		date: new Date().toISOString().split('T')[0],
 		clientName: '',
 		clientAddress: '',
+		note: 'If any work is extended on site, the additional amount will be added during the final completion and may be collected before the site is handed over.',
 		items: [{ sno: 1, name: '', quantity: 1, price: 0, total: 0 }]
 	});
 
@@ -108,7 +109,7 @@ const InvoiceGenerator = () => {
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; }
             .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #DAA520; padding-bottom: 20px; }
-            .logo { width: 80px; height: 80px; margin: 0 auto 10px; }
+            .logo { width: 25px; height: 20px; margin: 0 auto 10px; }
             .company-name { font-size: 24px; font-weight: bold; color: #DAA520; margin: 10px 0; }
             .company-tagline { font-size: 14px; color: #666; }
             .invoice-details { display: flex; justify-content: space-between; margin-bottom: 30px; }
@@ -128,7 +129,7 @@ const InvoiceGenerator = () => {
         <body>
           <div class="header">
            <div className="w-25 h-20 mx-auto mb-4 bg-slate-600 rounded-lg flex items-center justify-center">
-					<img src={draLogo} className="logo" alt="Dynamic Range Architects logo" />
+					<img src="https://res.cloudinary.com/dvstorage/image/upload/v1751884378/1000168781-removebg-preview_xjquev.png" className="logo" alt="Dynamic Range Architects logo" style="width: 80px; height: 60px;"/>
 			</div>
             <div class="company-name">DYNAMIC RANGE ARCHITECTS</div>
             <div class="company-tagline">Professional Architectural Services</div>
@@ -177,6 +178,23 @@ const InvoiceGenerator = () => {
           <div class="amount-words">
             <strong>Amount in Words:</strong> ${totalInWords} Rupees Only
           </div>
+
+		  <div style="margin-top: 30px; font-style: italic; color: #333; font-size: 14px;">
+ 		  ⚠️ <strong>Note:</strong> ${invoiceData.note}
+		  </div>
+
+		<div style="margin-top: 60px; display: flex; justify-content: space-between;">
+		<div style="text-align: center;">
+			<div style="border-top: 1px solid #999; width: 200px; margin: 0 auto; padding-top: 8px;">
+			Architect Signature
+			</div>
+		</div>
+		<div style="text-align: center;">
+			<div style="border-top: 1px solid #999; width: 200px; margin: 0 auto; padding-top: 8px;">
+			Client Signature
+			</div>
+		</div>
+		</div>
           
           <div class="footer">
             <p>Thank you for your business!</p>
@@ -331,13 +349,37 @@ const InvoiceGenerator = () => {
 				</div>
 			</div>
 
-			<div className="bg-gray-50 p-6 rounded-lg mb-8">
-				<div className="flex justify-between items-center mb-4">
+			<div className="bg-gray-50 p-6 rounded-lg mb-8 space-y-4">
+				<div className="flex justify-between items-center mb-2">
 					<span className="text-xl font-semibold">Grand Total:</span>
 					<span className="text-2xl font-bold text-yellow-600">₹{calculateTotal().toFixed(2)}</span>
 				</div>
+
 				<div className="text-sm text-gray-600">
 					<strong>Amount in Words:</strong> {numberToWords(Math.floor(calculateTotal()))} Rupees Only
+				</div>
+
+				<div className="text-sm text-gray-700 italic mt-4">
+					⚠️ <strong>Note:</strong>{invoiceData.note}
+				</div>
+				<div className="mb-8">
+					<label className="block text-sm font-medium text-gray-700 mb-1">Note (Optional)</label>
+					<textarea
+						value={invoiceData.note}
+						onChange={(e) => setInvoiceData({ ...invoiceData, note: e.target.value })}
+						className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+						rows="3"
+						placeholder="e.g. Additional charges may apply for extended work on site."
+					/>
+				</div>
+
+				<div className="flex justify-between items-center pt-8">
+					<div className="text-center">
+						<p className="text-sm text-gray-700 border-t border-gray-400 pt-2 w-48 mx-auto">Architect Signature</p>
+					</div>
+					<div className="text-center">
+						<p className="text-sm text-gray-700 border-t border-gray-400 pt-2 w-48 mx-auto">Client Signature</p>
+					</div>
 				</div>
 			</div>
 
