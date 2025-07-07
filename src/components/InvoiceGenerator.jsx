@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, Trash2, FileText, Download } from 'lucide-react';
 import draLogo from '/logo.svg'
 
@@ -11,6 +11,13 @@ const InvoiceGenerator = () => {
 		note: 'If any work is extended on site, the additional amount will be added during the final completion and may be collected before the site is handed over.',
 		items: [{ sno: 1, name: '', quantity: 1, price: 0, total: 0 }]
 	});
+
+	useEffect(() => {
+		const savedData = localStorage.getItem('invoiceData');
+		if (savedData) {
+			setInvoiceData(JSON.parse(savedData));
+		}
+	}, []);
 
 	const numberToWords = (num) => {
 		const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
@@ -390,6 +397,18 @@ const InvoiceGenerator = () => {
 				>
 					<Download size={20} />
 					Generate PDF Invoice
+				</button>
+			</div>
+			<div className="text-center mt-4">
+				<button
+					onClick={() => {
+						localStorage.setItem('invoiceData', JSON.stringify(invoiceData));
+						alert('Invoice data saved!');
+					}}
+					className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors mx-auto"
+				>
+					<FileText size={20} />
+					Save Invoice Data
 				</button>
 			</div>
 		</div>
