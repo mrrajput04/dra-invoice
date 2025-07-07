@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Trash2, FileText, Download } from 'lucide-react';
 import draLogo from '/logo.svg'
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
+
+const saveInvoiceToFirebase = async (invoiceData) => {
+	const docRef = doc(db, 'invoices', 'temp');
+	await setDoc(docRef, invoiceData);
+	alert('Invoice saved to Firebase!');
+};
 
 const InvoiceGenerator = () => {
 	const [invoiceData, setInvoiceData] = useState({
@@ -13,10 +21,20 @@ const InvoiceGenerator = () => {
 	});
 
 	useEffect(() => {
-		const savedData = localStorage.getItem('invoiceData');
-		if (savedData) {
-			setInvoiceData(JSON.parse(savedData));
-		}
+		// const savedData = localStorage.getItem('invoiceData');
+		// if (savedData) {
+		// 	setInvoiceData(JSON.parse(savedData));
+		// }
+		const loadInvoice = async () => {
+			const docRef = doc(db, 'invoices', 'temp'); // or dynamic ID
+			const docSnap = await getDoc(docRef);
+			console.log(docSnap.data())
+			if (docSnap.exists()) {
+				setInvoiceData(docSnap.data());
+			}
+		};
+
+		loadInvoice();
 	}, []);
 
 	const numberToWords = (num) => {
@@ -401,10 +419,7 @@ const InvoiceGenerator = () => {
 			</div>
 			<div className="text-center mt-4">
 				<button
-					onClick={() => {
-						localStorage.setItem('invoiceData', JSON.stringify(invoiceData));
-						alert('Invoice data saved!');
-					}}
+					onClick={async () => await saveInvoiceToFirebase(invoiceData)}
 					className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors mx-auto"
 				>
 					<FileText size={20} />
