@@ -5,32 +5,15 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Navbar from './Navbar';
 import { numberToWords } from '../utils/utils';
-import { useParams } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 
 const saveInvoiceToFirebase = async (invoiceData) => {
-	try {
-		const docId = invoiceData.invoiceNumber || `temp${Math.random().toString(10).substring(2, 10)}`;
-		const docRef = doc(db, 'invoices', docId);
-
-		// Check if document exists
-		const docSnap = await getDoc(docRef);
-		if (docSnap.exists()) {
-			// Update existing document
-			await setDoc(docRef, invoiceData, { merge: true });
-			alert('Invoice updated in Firebase!');
-		} else {
-			// Create new document
-			await setDoc(docRef, invoiceData);
-			alert('Invoice saved to Firebase!');
-		}
-	} catch (error) {
-		console.error('Error saving invoice:', error);
-		alert('Error saving invoice. Please try again.');
-	}
+	const docRef = doc(db, 'invoices', invoiceData.invoiceNumber || temp + Math.random().toString(10).substring(2, 10));
+	await setDoc(docRef, invoiceData);
+	alert('Invoice saved to Firebase!');
 };
 
-const InvoiceGenerator = () => {
+const CreateNewInvoice = () => {
 	const [invoiceData, setInvoiceData] = useState({
 		invoiceNumber: '',
 		date: new Date().toISOString().split('T')[0],
@@ -40,19 +23,47 @@ const InvoiceGenerator = () => {
 		items: [{ sno: 1, name: '', quantity: 1, price: 0, total: 0 }]
 	});
 
-	const { invoiceId } = useParams();
+	// useEffect(() => {
+	// 	const loadInvoice = async () => {
+	// 		const docRef = doc(db, 'invoices', 'temp'); // or dynamic ID
+	// 		const docSnap = await getDoc(docRef);
+	// 		if (docSnap.exists()) {
+	// 			setInvoiceData(docSnap.data());
+	// 		}
+	// 	};
 
-	useEffect(() => {
-		const loadInvoice = async () => {
-			const docRef = doc(db, 'invoices', invoiceId); // or dynamic ID
-			const docSnap = await getDoc(docRef);
-			if (docSnap.exists()) {
-				setInvoiceData(docSnap.data());
-			}
+	// 	loadInvoice();
+	// }, []);
+
+
+
+	const updateItem = (index, field, value) => {
+		const newItems = [...invoiceData.items];
+		newItems[index][field] = value;
+
+		if (field === 'quantity' || field === 'price') {
+			newItems[index].total = newItems[index].quantity * newItems[index].price;
+		}
+
+		setInvoiceData({ ...invoiceData, items: newItems });
+	};
+
+	const addItem = () => {
+		const newItem = {
+			sno: invoiceData.items.length + 1,
+			name: '',
+			quantity: 1,
+			price: 0,
+			total: 0
 		};
+		setInvoiceData({ ...invoiceData, items: [...invoiceData.items, newItem] });
+	};
 
-		loadInvoice();
-	}, []);
+	const removeItem = (index) => {
+		const newItems = invoiceData.items.filter((_, i) => i !== index);
+		const reindexedItems = newItems.map((item, i) => ({ ...item, sno: i + 1 }));
+		setInvoiceData({ ...invoiceData, items: reindexedItems });
+	};
 
 	const calculateTotal = () => {
 		return invoiceData.items.reduce((sum, item) => sum + item.total, 0);
@@ -139,36 +150,6 @@ const InvoiceGenerator = () => {
 		}
 	};
 
-	const updateItem = (index, field, value) => {
-		const newItems = [...invoiceData.items];
-		newItems[index][field] = value;
-
-		if (field === 'quantity' || field === 'price') {
-			newItems[index].total = newItems[index].quantity * newItems[index].price;
-		}
-
-		setInvoiceData({ ...invoiceData, items: newItems });
-	};
-
-	const addItem = () => {
-		const newItem = {
-			sno: invoiceData.items.length + 1,
-			name: '',
-			quantity: 1,
-			price: 0,
-			total: 0
-		};
-		setInvoiceData({ ...invoiceData, items: [...invoiceData.items, newItem] });
-	};
-
-	const removeItem = (index) => {
-		const newItems = invoiceData.items.filter((_, i) => i !== index);
-		const reindexedItems = newItems.map((item, i) => ({ ...item, sno: i + 1 }));
-		setInvoiceData({ ...invoiceData, items: reindexedItems });
-	};
-
-
-
 	const generatePDF = () => {
 		const total = calculateTotal();
 		const totalInWords = numberToWords(Math.floor(total));
@@ -181,8 +162,7 @@ const InvoiceGenerator = () => {
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; }
             .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #DAA520; padding-bottom: 20px; }
-			.logo-container { width: 150px; height: 100px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
-            .logo { width: 150px; height: 100px; margin: 0 auto 10px; }
+            .logo { width: 25px; height: 20px; margin: 0 auto 10px; }
             .company-name { font-size: 24px; font-weight: bold; color: #DAA520; margin: 7px 0; }
             .company-tagline { font-size: 14px; color: #666; }
             .invoice-details { display: flex; justify-content: space-between; margin-bottom: 30px; }
@@ -201,9 +181,9 @@ const InvoiceGenerator = () => {
         </head>
         <body>
           <div class="header">
-           <div class="logo-container">
-              <img src="https://res.cloudinary.com/dvstorage/image/upload/v1751884378/1000168781-removebg-preview_xjquev.png" class="logo" alt="Dynamic Range Architects logo" />
-            </div>
+           <div className="w-25 h-20 mx-auto mb-2 bg-slate-600 rounded-lg flex items-center justify-center">
+					<img src="https://res.cloudinary.com/dvstorage/image/upload/v1751884378/1000168781-removebg-preview_xjquev.png" className="logo" alt="Dynamic Range Architects logo" style="width: 150px; height: 80px;"/>
+			</div>
             <div class="company-name">DYNAMIC RANGE ARCHITECTS</div>
             <div class="company-tagline">Professional Architectural Services</div>
           </div>
@@ -492,4 +472,4 @@ const InvoiceGenerator = () => {
 	);
 };
 
-export default InvoiceGenerator;
+export default CreateNewInvoice;
