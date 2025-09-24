@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Trash2, FileText, Download } from 'lucide-react';
+import { Plus, Trash2, FileText, Download, Copy } from 'lucide-react';
 import draLogo from '/logo.svg'
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -57,6 +57,34 @@ const InvoiceGenerator = () => {
 	const calculateTotal = () => {
 		return invoiceData.items.reduce((sum, item) => sum + item.total, 0);
 	};
+
+	const copyInvoiceAsNew = async () => {
+	try {
+		// First, save the current invoice to Firebase
+		if (invoiceData.invoiceNumber && invoiceData.clientName) {
+			const currentDocId = invoiceData.invoiceNumber || `temp${Math.random().toString(10).substring(2, 10)}`;
+			const currentDocRef = doc(db, 'invoices', currentDocId);
+			await setDoc(currentDocRef, invoiceData);
+			console.log('Current invoice saved to Firebase');
+		}
+
+		// Create a new invoice with the same data but different ID
+		const newInvoiceData = {
+			...invoiceData,
+			invoiceNumber: '', // Clear invoice number for new invoice
+			date: new Date().toISOString().split('T')[0], // Set current date
+		};
+
+		// Update the state with new invoice data
+		setInvoiceData(newInvoiceData);
+
+		alert('Invoice copied! You can now edit the new invoice and assign a new invoice number.');
+		
+	} catch (error) {
+		console.error('Error copying invoice:', error);
+		alert('Error copying invoice. Please try again.');
+	}
+};
 
 	const exportToExcel = () => {
 		try {
@@ -464,7 +492,7 @@ const InvoiceGenerator = () => {
 							onClick={generatePDF}
 							className="flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors mx-auto"
 						>
-							<Download size={20} />
+							<Download size={16} />
 							Generate PDF Invoice
 						</button>
 					</div>
@@ -473,7 +501,7 @@ const InvoiceGenerator = () => {
 							onClick={async () => await saveInvoiceToFirebase(invoiceData)}
 							className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors mx-auto"
 						>
-							<FileText size={20} />
+							<FileText size={16} />
 							Save Invoice Data
 						</button>
 					</div>
@@ -482,10 +510,19 @@ const InvoiceGenerator = () => {
 							onClick={exportToExcel}
 							className="flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-md hover:bg-purple-700 transition-colors mx-auto mt-4"
 						>
-							<Download size={20} />
+							<Download size={16} />
 							Export to Excel
 						</button>
 					</div>
+					<div className="text-center">
+					<button
+						onClick={copyInvoiceAsNew}
+						className="flex items-center gap-2 bg-cyan-700 text-white px-6 py-3 rounded-md hover:bg-cyan-900 transition-colors mx-auto mt-4"
+					>
+						<Copy size={16} />
+						Copy as New Invoice
+					</button>
+				</div>
 				</div>
 			</div>
 		</>
