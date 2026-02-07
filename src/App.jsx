@@ -3,13 +3,16 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import InvoiceForm from './components/InvoiceGenerator'; // Your main invoice form component
 import Dashboard from './components/Dashboard';     // The dashboard component we built
 import CreateNewInvoice from './components/CreateNewInvoice';
+import BrandInvoice from './components/brandInvoice';
 
 function App() {
 	const [invoiceData, setInvoiceData] = useState({
 		invoiceNumber: '',
 		date: new Date().toISOString().split('T')[0],
+		panNumber:"CJWPC9884M",
 		clientName: '',
 		clientAddress: '',
+		clientGST: '',
 		note: '',
 		items: [{ sno: 1, name: '', quantity: 1, price: 0, total: 0 }]
 	});
@@ -41,6 +44,13 @@ function App() {
 					path="/create-new-invoice"
 					element={
 						<CreateNewInvoice />
+					}
+				/>
+
+				<Route
+					path="/brand-invoice"
+					element={
+						<BrandInvoice />
 					}
 				/>
 

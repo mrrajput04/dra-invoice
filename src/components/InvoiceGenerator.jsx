@@ -34,8 +34,10 @@ const InvoiceGenerator = () => {
 	const [invoiceData, setInvoiceData] = useState({
 		invoiceNumber: '',
 		date: new Date().toISOString().split('T')[0],
+		panNumber:"CJWPC9884M",
 		clientName: '',
 		clientAddress: '',
+		clientGST:'',
 		note: 'If any work is extended on site, the additional amount will be added during the final completion and may be collected before the site is handed over.',
 		items: [{ sno: 1, name: '', quantity: 1, price: 0, total: 0 }]
 	});
@@ -117,10 +119,12 @@ const InvoiceGenerator = () => {
 				['Invoice Details', ''],
 				['Invoice Number', invoiceData.invoiceNumber || 'N/A'],
 				['Date', invoiceData.date || 'N/A'],
+				['PAN Number', invoiceData.panNumber || 'N/A'],
 				['', ''],
 				['Client Information', ''],
 				['Client Name', invoiceData.clientName || 'N/A'],
 				['Client Address', invoiceData.clientAddress || 'N/A'],
+				['Client GST', invoiceData.clientGST || 'N/A'],
 				['', ''],
 				['Additional Information', ''],
 				['Note', invoiceData.note || 'N/A'],
@@ -211,7 +215,7 @@ const InvoiceGenerator = () => {
             .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #DAA520; padding-bottom: 20px; }
 			.logo-container { width: 150px; height: 100px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
             .logo { width: 150px; height: 100px; margin: 0 auto 10px; }
-            .company-name { font-size: 24px; font-weight: bold; color: #DAA520; margin: 7px 0; }
+            .company-name { font-size: 24px; font-weight: bold; color: #DAA520; margin: 5px 0; }
             .company-tagline { font-size: 14px; color: #666; }
             .invoice-details { display: flex; justify-content: space-between; margin-bottom: 30px; }
             .client-info, .invoice-info { flex: 1; }
@@ -241,11 +245,13 @@ const InvoiceGenerator = () => {
               <h3>Bill To:</h3>
               <strong>${invoiceData.clientName}</strong><br>
               ${invoiceData.clientAddress.replace(/\n/g, '<br>')}
+			  <strong>Client GST:</strong> ${invoiceData.clientGST}
             </div>
             <div class="invoice-info">
               <h3>Invoice Details:</h3>
               <strong>Invoice #:</strong> ${invoiceData.invoiceNumber}<br>
               <strong>Date:</strong> ${new Date(invoiceData.date).toLocaleDateString()}
+			  <strong>PAN Number:</strong> ${invoiceData.panNumber}
             </div>
           </div>
           
@@ -346,6 +352,15 @@ const InvoiceGenerator = () => {
 									className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
 								/>
 							</div>
+							<div>
+								<label className="block text-sm font-medium text-gray-700 mb-1">PAN Number</label>
+								<input
+									type="text"
+									value={invoiceData.panNumber}
+									onChange={(e) => setInvoiceData({ ...invoiceData, panNumber: e.target.value })}
+									className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+								/>
+							</div>
 						</div>
 					</div>
 
@@ -370,6 +385,16 @@ const InvoiceGenerator = () => {
 									className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
 									rows="3"
 									placeholder="Client Address"
+								/>
+							</div>
+							<div>
+								<label className="block text-sm font-medium text-gray-700 mb-1">Client GST</label>
+								<input
+									type="text"
+									value={invoiceData.clientGST}
+									onChange={(e) => setInvoiceData({ ...invoiceData, clientGST: e.target.value })}
+									className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+									placeholder="Client GST"
 								/>
 							</div>
 						</div>

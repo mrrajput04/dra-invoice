@@ -19,6 +19,13 @@ function Navbar() {
 			>
 				Create New Invoice
 			</Link>
+			<Link
+				to="/brand-invoice"
+				className={`hover:underline px-3 py-2 rounded ${location.pathname === '/brand-invoice' ? 'bg-gray-600' : ''
+					}`}
+			>
+				Brand Invoice
+			</Link>
 
 		</nav>
 	);
