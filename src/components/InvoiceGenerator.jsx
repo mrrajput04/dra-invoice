@@ -39,7 +39,8 @@ const InvoiceGenerator = () => {
 		clientAddress: '',
 		clientGST:'',
 		note: 'If any work is extended on site, the additional amount will be added during the final completion and may be collected before the site is handed over.',
-		items: [{ sno: 1, name: '', quantity: 1, price: 0, total: 0 }]
+		items: [{ sno: 1, name: '', quantity: 1, price: 0, total: 0 }],
+		brandInvoice:false
 	});
 
 	const { invoiceId } = useParams();

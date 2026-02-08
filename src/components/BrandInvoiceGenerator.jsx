@@ -6,14 +6,31 @@ import { db } from '../../firebase';
 import Navbar from './Navbar';
 import { numberToWords } from '../utils/utils';
 import * as XLSX from 'xlsx';
+import { useParams } from 'react-router-dom';
 
 const saveInvoiceToFirebase = async (invoiceData) => {
-    const docRef = doc(db, 'invoices', invoiceData.invoiceNumber || temp + Math.random().toString(10).substring(2, 10));
-    await setDoc(docRef, invoiceData);
-    alert('Invoice saved to Firebase!');
+	try {
+		const docId = invoiceData.invoiceNumber || `temp${Math.random().toString(10).substring(2, 10)}`;
+		const docRef = doc(db, 'invoices', docId);
+
+		// Check if document exists
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists()) {
+			// Update existing document
+			await setDoc(docRef, invoiceData, { merge: true });
+			alert('Invoice updated in Firebase!');
+		} else {
+			// Create new document
+			await setDoc(docRef, invoiceData);
+			alert('Invoice saved to Firebase!');
+		}
+	} catch (error) {
+		console.error('Error saving invoice:', error);
+		alert('Error saving invoice. Please try again.');
+	}
 };
 
-const BrandInvoice = () => {
+const BrandInvoiceGenerator = () => {
 const [invoiceData, setInvoiceData] = useState({
   // FROM
   fromName: 'Aaditya Chakravarty',
@@ -41,20 +58,19 @@ const [invoiceData, setInvoiceData] = useState({
   brandInvoice:true
 });
 
+const { invoiceId } = useParams();
 
-    // useEffect(() => {
-    // 	const loadInvoice = async () => {
-    // 		const docRef = doc(db, 'invoices', 'temp'); // or dynamic ID
-    // 		const docSnap = await getDoc(docRef);
-    // 		if (docSnap.exists()) {
-    // 			setInvoiceData(docSnap.data());
-    // 		}
-    // 	};
-
-    // 	loadInvoice();
-    // }, []);
-
-
+    useEffect(() => {
+        const loadInvoice = async () => {
+          const docRef = doc(db, 'invoices', invoiceId); // or dynamic ID
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setInvoiceData(docSnap.data());
+          }
+        };
+    
+        loadInvoice();
+      }, []);
 
     const updateItem = (index, field, value) => {
         const newItems = [...invoiceData.items];
@@ -86,6 +102,34 @@ const [invoiceData, setInvoiceData] = useState({
 
     const calculateTotal = () => {
         return invoiceData.items.reduce((sum, item) => sum + item.total, 0);
+    };
+
+    const copyInvoiceAsNew = async () => {
+      try {
+        // First, save the current invoice to Firebase
+        if (invoiceData.invoiceNumber && invoiceData.clientName) {
+          const currentDocId = invoiceData.invoiceNumber || `temp${Math.random().toString(10).substring(2, 10)}`;
+          const currentDocRef = doc(db, 'invoices', currentDocId);
+          await setDoc(currentDocRef, invoiceData);
+          console.log('Current invoice saved to Firebase');
+        }
+    
+        // Create a new invoice with the same data but different ID
+        const newInvoiceData = {
+          ...invoiceData,
+          invoiceNumber: '', // Clear invoice number for new invoice
+          date: new Date().toISOString().split('T')[0], // Set current date
+        };
+    
+        // Update the state with new invoice data
+        setInvoiceData(newInvoiceData);
+    
+        alert('Invoice copied! You can now edit the new invoice and assign a new invoice number.');
+        
+      } catch (error) {
+        console.error('Error copying invoice:', error);
+        alert('Error copying invoice. Please try again.');
+      }
     };
 
     const exportToExcel = () => {
@@ -543,4 +587,4 @@ const [invoiceData, setInvoiceData] = useState({
     );
 };
 
-export default BrandInvoice;
+export default BrandInvoiceGenerator;
