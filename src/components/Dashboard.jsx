@@ -57,7 +57,7 @@ const Dashboard = ({ onInvoiceSelect }) => {
 		inv.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
 		inv.clientName?.toLowerCase().includes(searchTerm.toLowerCase())
 	);
-
+console.log(filteredInvoices);
 	return (
 		<>
 			<Navbar />
@@ -81,12 +81,18 @@ const Dashboard = ({ onInvoiceSelect }) => {
 								key={inv.id}
 								className="flex justify-between items-center p-3 rounded border border-gray-300 hover:bg-gray-100 transition"
 							>
+								{inv.brandInvoice===true?<Link to={`/brand-invoice/${inv.id}`} className="cursor-pointer flex-1">
+									<div className="font-semibold">{inv.invoiceNumber || inv.id}</div>
+									<div className="text-sm text-gray-600">
+										{inv.clientName} • ₹{inv.items?.reduce((sum, i) => sum + i.total, 0).toFixed(2)} • {inv.date}
+									</div>
+								</Link>:
 								<Link to={`/invoice/${inv.id}`} className="cursor-pointer flex-1">
 									<div className="font-semibold">{inv.invoiceNumber || inv.id}</div>
 									<div className="text-sm text-gray-600">
 										{inv.clientName} • ₹{inv.items?.reduce((sum, i) => sum + i.total, 0).toFixed(2)} • {inv.date}
 									</div>
-								</Link>
+								</Link>}
 								<button
 									onClick={() => deleteInvoice(inv.id)}
 									className="text-red-600 hover:text-red-800 ml-2"

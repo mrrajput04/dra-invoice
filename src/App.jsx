@@ -3,15 +3,20 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import InvoiceForm from './components/InvoiceGenerator'; // Your main invoice form component
 import Dashboard from './components/Dashboard';     // The dashboard component we built
 import CreateNewInvoice from './components/CreateNewInvoice';
+import BrandInvoice from './components/brandInvoice';
+import BrandInvoiceGenerator from './components/BrandInvoiceGenerator';
 
 function App() {
 	const [invoiceData, setInvoiceData] = useState({
 		invoiceNumber: '',
 		date: new Date().toISOString().split('T')[0],
+		panNumber:"CJWPC9884M",
 		clientName: '',
 		clientAddress: '',
+		clientGST: '',
 		note: '',
-		items: [{ sno: 1, name: '', quantity: 1, price: 0, total: 0 }]
+		items: [{ sno: 1, name: '', quantity: 1, price: 0, total: 0 }],
+		brandInvioce:false
 	});
 
 	// Function to load invoice by id (pass to Dashboard)
@@ -36,11 +41,27 @@ function App() {
 							setInvoiceData={setInvoiceData}
 						/>
 					}
+					/>
+				<Route
+					path="/brand-invoice/:invoiceId"
+					element={
+						<BrandInvoiceGenerator
+							invoiceData={invoiceData}
+							setInvoiceData={setInvoiceData}
+						/>
+					}
 				/>
 				<Route
 					path="/create-new-invoice"
 					element={
 						<CreateNewInvoice />
+					}
+				/>
+
+				<Route
+					path="/brand-invoice"
+					element={
+						<BrandInvoice />
 					}
 				/>
 
